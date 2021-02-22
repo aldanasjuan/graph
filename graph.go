@@ -1,6 +1,7 @@
 package graph
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -64,8 +65,11 @@ func (n *Node) AddParent(name string, value interface{}, all bool) *Node {
 			newparent.Name: newparent,
 		}
 	} else {
-		newparent.Children[n.Name] = n
+		newparent.Children = map[string]*Node{
+			n.Name: n,
+		}
 		parent.Children[newparent.Name] = newparent
+		delete(parent.Children, n.Name)
 	}
 	return newparent
 }
@@ -124,4 +128,20 @@ func (n *Node) Get(path string, global bool) *Node {
 	}
 
 	return el
+}
+
+//PrintAll prints the tree
+func (n *Node) PrintAll() {
+	r := n.Root()
+	lvl := 0
+	r.Print(lvl)
+}
+
+//Print ...
+func (n *Node) Print(level int) {
+	ident := strings.Join(make([]string, level+1), "  ")
+	fmt.Printf("%v- name: '%v' value: %v\n", ident, n.Name, n.Value)
+	for _, v := range n.Children {
+		v.Print(level + 1)
+	}
 }
